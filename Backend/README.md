@@ -166,3 +166,131 @@ curl -X POST http://localhost:4000/users/register \
 - The password field is excluded from query results by default (`select: false` on the schema).
 - The JWT token is signed using the `JWT_SECRET` environment variable and expires in **24 hours**.
 - The `email` field has a **unique constraint** in the database — duplicate emails are rejected.
+
+---
+
+### Login User
+
+Authenticates an existing user with email and password, and returns a JWT token.
+
+**URL:** `/users/login`
+
+**Method:** `POST`
+
+**Content-Type:** `application/json`
+
+---
+
+#### Request Body
+
+| Field      | Type     | Required | Validation                             |
+| ---------- | -------- | -------- | -------------------------------------- |
+| `email`    | `string` | ✅ Yes   | Must be a valid email                  |
+| `password` | `string` | ✅ Yes   | Minimum 6 characters                   |
+
+#### Example Request
+
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+```
+
+---
+
+#### Responses
+
+##### ✅ 200 OK — Login Successful
+
+Returned when the credentials are valid. A `token` cookie is also set on the response.
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "john.doe@example.com",
+    "_id": "64a1b2c3d4e5f6a7b8c9d0e1",
+    "__v": 0
+  }
+}
+```
+
+| Field   | Type     | Description                                      |
+| ------- | -------- | ------------------------------------------------ |
+| `token` | `string` | JWT token valid for 24 hours, used for auth       |
+| `user`  | `object` | The authenticated user object                     |
+
+---
+
+##### ❌ 400 Bad Request — Validation Errors
+
+Returned when the email or password fields fail validation.
+
+```json
+{
+  "errors": [
+    {
+      "type": "field",
+      "value": "invalid-email",
+      "msg": "Invalid Email",
+      "path": "email",
+      "location": "body"
+    },
+    {
+      "type": "field",
+      "value": "123",
+      "msg": "Password must be at least 6 characters long",
+      "path": "password",
+      "location": "body"
+    }
+  ]
+}
+```
+
+---
+
+##### ❌ 401 Unauthorized — Invalid Credentials
+
+Returned when the email does not exist or the password does not match.
+
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+---
+
+#### Status Codes Summary
+
+| Status Code | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `200`       | Login successful, returns token and user             |
+| `400`       | Validation failed (invalid email format or short password) |
+| `401`       | Email not found or password does not match           |
+
+---
+
+#### cURL Example
+
+```bash
+curl -X POST http://localhost:4000/users/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john.doe@example.com",
+    "password": "password123"
+  }'
+```
+
+---
+
+#### Notes
+
+- The password is compared against the stored bcrypt hash using `bcrypt.compare()`.
+- On success, a `token` cookie is set on the response in addition to returning the token in the JSON body.
+- The JWT token is signed using the `JWT_SECRET` environment variable and expires in **24 hours**.
