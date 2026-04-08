@@ -294,3 +294,157 @@ curl -X POST http://localhost:4000/users/login \
 - The password is compared against the stored bcrypt hash using `bcrypt.compare()`.
 - On success, a `token` cookie is set on the response in addition to returning the token in the JSON body.
 - The JWT token is signed using the `JWT_SECRET` environment variable and expires in **24 hours**.
+
+---
+
+### Get User Profile
+
+Returns the authenticated user's profile information. Requires a valid JWT token.
+
+**URL:** `/users/profile`
+
+**Method:** `GET`
+
+**Authentication:** 🔒 Required
+
+---
+
+#### Headers
+
+| Header          | Value                  | Required | Description                          |
+| --------------- | ---------------------- | -------- | ------------------------------------ |
+| `Authorization` | `Bearer <token>`       | ✅ Yes*  | JWT token from login/register        |
+| `Cookie`        | `token=<token>`        | ✅ Yes*  | Alternative: token set via cookie    |
+
+> \* At least one of `Authorization` header or `token` cookie must be provided.
+
+---
+
+#### Responses
+
+##### ✅ 200 OK — Profile Retrieved
+
+```json
+{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "john.doe@example.com",
+  "_id": "64a1b2c3d4e5f6a7b8c9d0e1",
+  "__v": 0
+}
+```
+
+---
+
+##### ❌ 401 Unauthorized
+
+Returned when no token is provided, the token is invalid/expired, or the token has been blacklisted.
+
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+---
+
+#### Status Codes Summary
+
+| Status Code | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `200`       | Profile returned successfully                        |
+| `401`       | Missing, invalid, expired, or blacklisted token      |
+
+---
+
+#### cURL Example
+
+```bash
+curl -X GET http://localhost:4000/users/profile \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+---
+
+#### Notes
+
+- The middleware checks for the token in both `req.cookies.token` and the `Authorization: Bearer <token>` header.
+- Blacklisted tokens (from logout) are rejected even if they haven't expired.
+- The password field is **never** included in the response (`select: false` on the schema).
+
+---
+
+### Logout User
+
+Logs out the authenticated user by blacklisting the current JWT token and clearing the token cookie.
+
+**URL:** `/users/logout`
+
+**Method:** `GET`
+
+**Authentication:** 🔒 Required
+
+---
+
+#### Headers
+
+| Header          | Value                  | Required | Description                          |
+| --------------- | ---------------------- | -------- | ------------------------------------ |
+| `Authorization` | `Bearer <token>`       | ✅ Yes*  | JWT token from login/register        |
+| `Cookie`        | `token=<token>`        | ✅ Yes*  | Alternative: token set via cookie    |
+
+> \* At least one of `Authorization` header or `token` cookie must be provided.
+
+---
+
+#### Responses
+
+##### ✅ 200 OK — Logout Successful
+
+The token is added to the blacklist and the `token` cookie is cleared.
+
+```json
+{
+  "message": "Logged out"
+}
+```
+
+---
+
+##### ❌ 401 Unauthorized
+
+Returned when no token is provided, the token is invalid/expired, or the token has already been blacklisted.
+
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+---
+
+#### Status Codes Summary
+
+| Status Code | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `200`       | Logout successful, token blacklisted                 |
+| `401`       | Missing, invalid, expired, or blacklisted token      |
+
+---
+
+#### cURL Example
+
+```bash
+curl -X GET http://localhost:4000/users/logout \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+---
+
+#### Notes
+
+- The token is stored in the `BlacklistToken` collection with a TTL of **24 hours** (`expires: 86400`), matching the JWT expiry. MongoDB automatically removes expired blacklist entries.
+- The `token` cookie is cleared from the response using `res.clearCookie('token')`.
+- Once a token is blacklisted, any subsequent request using that token will receive a `401 Unauthorized` response.
