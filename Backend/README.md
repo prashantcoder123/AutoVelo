@@ -448,3 +448,194 @@ curl -X GET http://localhost:4000/users/logout \
 - The token is stored in the `BlacklistToken` collection with a TTL of **24 hours** (`expires: 86400`), matching the JWT expiry. MongoDB automatically removes expired blacklist entries.
 - The `token` cookie is cleared from the response using `res.clearCookie('token')`.
 - Once a token is blacklisted, any subsequent request using that token will receive a `401 Unauthorized` response.
+
+---
+
+## Captain Endpoints
+
+### Register Captain
+
+Creates a new captain (driver) account with vehicle information and returns a JWT authentication token.
+
+**URL:** `/captains/register`
+
+**Method:** `POST`
+
+**Content-Type:** `application/json`
+
+---
+
+#### Request Body
+
+| Field                  | Type     | Required | Validation                                       |
+| ---------------------- | -------- | -------- | ------------------------------------------------ |
+| `fullname.firstname`   | `string` | ✅ Yes   | Minimum 3 characters                             |
+| `fullname.lastname`    | `string` | ❌ No    | Minimum 3 characters (if provided)               |
+| `email`                | `string` | ✅ Yes   | Must be a valid email                            |
+| `password`             | `string` | ✅ Yes   | Minimum 6 characters                             |
+| `vehicle.color`        | `string` | ✅ Yes   | Minimum 3 characters                             |
+| `vehicle.plate`        | `string` | ✅ Yes   | Minimum 3 characters                             |
+| `vehicle.capacity`     | `number` | ✅ Yes   | Minimum 1                                        |
+| `vehicle.vehicleType`  | `string` | ✅ Yes   | Must be one of: `car`, `motorcycle`, `auto`      |
+
+#### Example Request
+
+```json
+{
+  "fullname": {
+    "firstname": "Alex",
+    "lastname": "Smith"
+  },
+  "email": "alex.smith@example.com",
+  "password": "driver123",
+  "vehicle": {
+    "color": "Black",
+    "plate": "MH01AB1234",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+#### Minimal Request (without optional fields)
+
+```json
+{
+  "fullname": {
+    "firstname": "Alex"
+  },
+  "email": "alex.smith@example.com",
+  "password": "driver123",
+  "vehicle": {
+    "color": "Red",
+    "plate": "MH02XY5678",
+    "capacity": 2,
+    "vehicleType": "motorcycle"
+  }
+}
+```
+
+---
+
+#### Responses
+
+##### ✅ 201 Created — Registration Successful
+
+Returned when the captain is successfully registered.
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "fullname": {
+      "firstname": "Alex",
+      "lastname": "Smith"
+    },
+    "email": "alex.smith@example.com",
+    "status": "inactive",
+    "vehicle": {
+      "color": "Black",
+      "plate": "MH01AB1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "_id": "64a1b2c3d4e5f6a7b8c9d0e2",
+    "__v": 0
+  }
+}
+```
+
+| Field     | Type     | Description                                      |
+| --------- | -------- | ------------------------------------------------ |
+| `token`   | `string` | JWT token valid for 24 hours, used for auth       |
+| `captain` | `object` | The created captain object (password is excluded) |
+
+---
+
+##### ❌ 400 Bad Request — Validation Errors
+
+Returned when one or more fields fail validation.
+
+```json
+{
+  "errors": [
+    {
+      "type": "field",
+      "value": "invalid-email",
+      "msg": "Invalid Email",
+      "path": "email",
+      "location": "body"
+    },
+    {
+      "type": "field",
+      "value": "Al",
+      "msg": "First name must be at least 3 characters long",
+      "path": "fullname.firstname",
+      "location": "body"
+    },
+    {
+      "type": "field",
+      "value": "truck",
+      "msg": "Invalid vehicle type",
+      "path": "vehicle.vehicleType",
+      "location": "body"
+    }
+  ]
+}
+```
+
+---
+
+##### ❌ 400 Bad Request — Captain Already Exists
+
+Returned when a captain with the given email is already registered.
+
+```json
+{
+  "message": "Captain already exist"
+}
+```
+
+---
+
+#### Status Codes Summary
+
+| Status Code | Description                                             |
+| ----------- | ------------------------------------------------------- |
+| `201`       | Captain created successfully, returns token and captain |
+| `400`       | Validation failed or captain with this email exists     |
+
+---
+
+#### cURL Example
+
+```bash
+curl -X POST http://localhost:4000/captains/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullname": {
+      "firstname": "Alex",
+      "lastname": "Smith"
+    },
+    "email": "alex.smith@example.com",
+    "password": "driver123",
+    "vehicle": {
+      "color": "Black",
+      "plate": "MH01AB1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  }'
+```
+
+---
+
+#### Notes
+
+- The password is **hashed with bcrypt** (10 salt rounds) before being stored in the database.
+- The password field is excluded from query results by default (`select: false` on the schema).
+- The JWT token is signed using the `JWT_SECRET` environment variable and expires in **24 hours**.
+- The `email` field has a **unique constraint** and is stored in **lowercase**.
+- The captain's `status` defaults to `"inactive"` upon registration.
+- Allowed `vehicleType` values are: `car`, `motorcycle`, `auto`.
+- The `location` field (with `ltd` and `lng`) is part of the schema but is **not set during registration** — it is updated when the captain goes online.
