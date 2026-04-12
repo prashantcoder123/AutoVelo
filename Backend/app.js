@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    res.send('AutoVelo Backend Run');
 });
 app.use('/users', userRoutes);
 
