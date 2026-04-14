@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 import FinishRide from '../components/FinishRide'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import autovelologo from '../assets/autovelologo.jpeg';
+
 // import LiveTracking from '../components/LiveTracking'
 
 const CaptainRiding = () => {
@@ -31,7 +33,7 @@ const CaptainRiding = () => {
         <div className='h-screen relative flex flex-col justify-end'>
 
             <div className='fixed p-6 top-0 flex items-center justify-between w-screen'>
-                <img className='w-16' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="" />
+                <img className='w-16' src={autovelologo} alt="" />
                 <Link to='/captain-home' className=' h-10 w-10 bg-white flex items-center justify-center rounded-full'>
                     <i className="text-lg font-medium ri-logout-box-r-line"></i>
                 </Link>

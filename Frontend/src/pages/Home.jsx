@@ -9,6 +9,7 @@ import VehiclePanel from '../components/VehiclePanel';
 import ConfirmRide from '../components/ConfirmRide';
 import LookingForDriver from '../components/LookingForDriver';
 import WaitingForDriver from '../components/WaitingForDriver';
+import autovelologo from '../assets/autovelologo.jpeg';
 
 
 const Home = () => {
@@ -114,7 +115,7 @@ const Home = () => {
 
     return (
         <div className='h-screen realtive overflow-hidden'>
-            <img className='w-16 absolute left-5 top-5' src="https://imgs.search.brave.com/XlbP0O9smOgJXbVsMtiphbtLvgL0_KADofNe4aeA12o/rs:fit:0:180:1:0/g:ce/aHR0cHM6Ly9pbWcu/ZmF2cG5nLmNvbS8x/NC81LzkvdWJlci1s/b2dvLXViZXItbG9n/by1kWGcydUZuZ190/LmpwZw" alt="" />
+            <img className='w-16 absolute left-5 top-5' src={autovelologo} alt="" />
             <div className='h-screen w-screen'>
                 {/* image for temporary use */}
                 <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
