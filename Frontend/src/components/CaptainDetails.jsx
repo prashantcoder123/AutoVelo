@@ -1,12 +1,26 @@
-import React from 'react'
-
+// import React, { useContext } from 'react'
+import { CaptainDataContext } from '../context/CapatainContext'
+import React, { useContext, useEffect, useState } from 'react'
+import { SocketContext } from '../context/SocketContext'
 const CaptainDetails = () => {
+    const { captain } = useContext(CaptainDataContext)
+    const { socket } = useContext(SocketContext)
+    useEffect(() => {
+        socket.on("payment-received", (data) => {
+            alert(`💰 Payment Received ₹${data.fare}`)
+        })
+
+        return () => {
+            socket.off("payment-received")
+        }
+    }, [socket])
+
     return (
         <div>
             <div className='flex items-center justify-between'>
                 <div className='flex items-center justify-start gap-3'>
                     <img className='h-12 w-12 rounded-full obj-cover' src="https://imgs.search.brave.com/ZEMvWGNpv5LLOHF304uxZnf26LXqAAWNUkwKrDzErBo/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTM0/MDI5MjYzOC9waG90/by9mZW1hbGUtc29s/by1sYWR5LXNob3Bw/ZXItYXQtYS1yYW5k/b20tbG9jYWwtbmln/aHQtbWFya2V0LWlu/LWJhbmdrb2stdGhh/aWxhbmQuanBnP3M9/NjEyeDYxMiZ3PTAm/az0yMCZjPUFvb0JJ/b0ZFSDVqb0J5aks4/QUhWTFJvZEtPcHFn/WWdBamt2Ynpuc1Ax/X1E9" alt="" />
-                    <h4 className='text-lg font-medium'>Harsh Patel</h4>
+                    <h4 className='text-lg font-medium capitalize'>{captain.fullname.firstname + " " + captain.fullname.lastname}</h4>
                 </div>
                 <div>
                     <h4 className='text-lg font-semibold'>₹295.20</h4>

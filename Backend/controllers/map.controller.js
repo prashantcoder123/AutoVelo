@@ -19,43 +19,46 @@ module.exports.getCoordinates = async (req, res, next) => {
     }
 }
 
-// module.exports.getDistanceTime = async (req, res, next) => {
 
-//     try {
+module.exports.getDistanceTime = async (req, res, next) => {
 
-//         const errors = validationResult(req);
-//         if (!errors.isEmpty()) {
-//             return res.status(400).json({ errors: errors.array() });
-//         }
+    try {
 
-//         const { origin, destination } = req.query;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
 
-//         const distanceTime = await mapService.getDistanceTime(origin, destination);
+        const { origin, destination } = req.query;
 
-//         res.status(200).json(distanceTime);
+        const distanceTime = await mapService.getDistanceTime(origin, destination);
 
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// }
+        res.status(200).json(distanceTime);
 
-// module.exports.getAutoCompleteSuggestions = async (req, res, next) => {
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
 
-//     try {
 
-//         const errors = validationResult(req);
-//         if (!errors.isEmpty()) {
-//             return res.status(400).json({ errors: errors.array() });
-//         }
 
-//         const { input } = req.query;
+module.exports.getAutoCompleteSuggestions = async (req, res, next) => {
 
-//         const suggestions = await mapService.getAutoCompleteSuggestions(input);
+    try {
 
-//         res.status(200).json(suggestions);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// }
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const { input } = req.query;
+
+        const suggestions = await mapService.getAutoCompleteSuggestions(input);
+
+        res.status(200).json(suggestions);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
