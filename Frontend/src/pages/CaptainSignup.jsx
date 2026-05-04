@@ -35,7 +35,7 @@ const CaptainSignup = () => {
             vehicle: {
                 color: vehicleColor,
                 plate: vehiclePlate,
-                capacity: vehicleCapacity,
+                capacity: parseInt(vehicleCapacity),
                 vehicleType: vehicleType
             }
         }
@@ -162,7 +162,7 @@ const CaptainSignup = () => {
                             <option value="" disabled>Select Vehicle Type</option>
                             <option value="car">Car</option>
                             <option value="auto">Auto</option>
-                            <option value="moto">Moto</option>
+                            <option value="motorcycle">Moto</option>
                         </select>
                     </div>
 

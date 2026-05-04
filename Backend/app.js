@@ -18,10 +18,7 @@ const rideHistoryRoutes = require("./routes/rideHistory.routes");
 
 connectToDb();
 app.use(cookieParser());
-app.use(cors({
-    origin: true,
-    credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
