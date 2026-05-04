@@ -1,78 +1,112 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom' // Added useLocation
-import { useEffect, useContext } from 'react'
+
+
+import React, { useEffect, useContext } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { SocketContext } from '../context/SocketContext'
-import { useNavigate } from 'react-router-dom'
 import LiveTracking from '../components/LiveTracking'
 
 const Riding = () => {
+
     const location = useLocation()
-    const { ride } = location.state || {} // Retrieve ride data
+    const { ride } = location.state || {}
+
     const { socket } = useContext(SocketContext)
     const navigate = useNavigate()
 
-    socket.on("ride-ended", () => {
-        navigate('/home')
-    })
+    // ✅ FIX: socket inside useEffect
+    useEffect(() => {
+        socket.on("ride-ended", () => {
+            navigate('/home')
+        })
+
+        return () => {
+            socket.off("ride-ended")
+        }
+    }, [socket, navigate])
+
+    // ❌ If ride not loaded yet
+    if (!ride) {
+        return <div className="p-5 text-center">Loading ride...</div>
+    }
 
     return (
         <div className='h-screen'>
-            {/* <Link to='/home' className='fixed right-2 top-20 h-10 w-10 bg-white flex items-center justify-center rounded-full'>
-                <i className="text-lg font-medium ri-home-5-line"></i>
-            </Link> */}
+
+            {/* MAP */}
             <div className='h-1/2'>
-                {/* <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" /> */}
                 <LiveTracking />
             </div>
+
+            {/* DETAILS */}
             <div className='h-1/2 p-4'>
+
+                {/* DRIVER INFO */}
                 <div className='flex items-center justify-between'>
-                    <img className='h-12' src="https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg" alt="" />
+                    <img
+                        className='h-12'
+                        src="https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg"
+                        alt="car"
+                    />
+
                     <div className='text-right'>
-                        <h2 className='text-lg font-medium capitalize'>{ride?.captain.fullname.firstname + ' ' + ride?.captain.fullname.lastname}</h2>
-                        <h4 className='text-xl font-semibold -mt-1 -mb-1'>{ride?.captain.vehicle.plate}</h4>
-                        <p className='text-sm text-gray-600'>Maruti Suzuki Alto</p>
-                        {/* <h1 className='text-lg font-semibold'>  {props.ride?.otp} </h1> */}
+                        <h2 className='text-lg font-medium capitalize'>
+                            {ride?.captain?.fullname?.firstname} {ride?.captain?.fullname?.lastname}
+                        </h2>
+
+                        <h4 className='text-xl font-semibold -mt-1 -mb-1'>
+                            {ride?.captain?.vehicle?.plate}
+                        </h4>
+
+                        <p className='text-sm text-gray-600'>
+                            {ride?.captain?.vehicle?.model || "Vehicle"}
+                        </p>
                     </div>
                 </div>
 
-                <div className='flex gap-2 justify-between flex-col items-center'>
+                {/* RIDE INFO */}
+                <div className='flex gap-2 flex-col items-center'>
                     <div className='w-full mt-5'>
-                        {/* <div className='flex items-center gap-5 p-3 border-b-2'>
-                            <i className="ri-map-pin-user-fill"></i>
-                            <div>
-                                <h3 className='text-lg font-medium'>562/11-A</h3>
-                                <p className='text-sm -mt-1 text-gray-600'>Kankariya Talab, Bhopal</p>
-                            </div>
-                        </div> */}
+
+                        {/* DESTINATION */}
                         <div className='flex items-center gap-5 p-3 border-b-2'>
                             <i className="text-lg ri-map-pin-2-fill"></i>
                             <div>
-                                <h3 className='text-lg font-medium'>562/11-A</h3>
-                                <p className='text-sm -mt-1 text-gray-600'>{ride?.destination}</p>
+                                <h3 className='text-lg font-medium'>Destination</h3>
+                                <p className='text-sm text-gray-600'>
+                                    {ride?.destination?.address || "Loading..."}
+                                </p>
                             </div>
                         </div>
-                        <Link to='/home' className='fixed right-2 top-20 h-10 w-10 bg-white flex items-center justify-center rounded-full'>
-                            <i className="text-lg font-medium ri-home-5-line"></i>
-                        </Link>
-                        {/* // ya like hai ku ke home pe jana
-                         h aur map ke wajha se nhi show ho rha tha 
-                         agar hota toh upar bala use kr lenge esko comment kr denge .. */}
+
+                        {/* FARE */}
                         <div className='flex items-center gap-5 p-3'>
                             <i className="ri-currency-line"></i>
                             <div>
-                                <h3 className='text-lg font-medium'>{ride?.fare} </h3>
-                                <p className='text-sm -mt-1 text-gray-600'>Cash Cash</p>
+                                <h3 className='text-lg font-medium'>
+                                    ₹{ride?.fare}
+                                </h3>
+                                <p className='text-sm text-gray-600'>Cash</p>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                {/* HOME BUTTON */}
+                <Link
+                    to='/home'
+                    className='fixed right-2 top-20 h-10 w-10 bg-white flex items-center justify-center rounded-full shadow'
+                >
+                    <i className="text-lg font-medium ri-home-5-line"></i>
+                </Link>
+
+                {/* PAYMENT BUTTON */}
                 <button
                     onClick={() => navigate('/payment', { state: { ride } })}
                     className='w-full mt-5 bg-green-600 text-white font-semibold p-2 rounded-lg'
                 >
                     Make a Payment
                 </button>
-                {/* <button className='w-full mt-5 bg-green-600 text-white font-semibold p-2 rounded-lg'>Make a Payment</button> */}
+
             </div>
         </div>
     )

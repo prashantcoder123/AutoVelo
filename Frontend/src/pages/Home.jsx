@@ -15,6 +15,7 @@ import { useContext } from 'react';
 import { UserDataContext } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import LiveTracking from '../components/LiveTracking';
+import ChatBot from '../components/Chatbot';
 const Home = () => {
 
     const [pickup, setPickup] = useState('')
@@ -62,21 +63,49 @@ const Home = () => {
     })
 
 
-    const handlePickupChange = async (e) => {
-        setPickup(e.target.value)
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
-                params: { input: e.target.value },
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+    useEffect(() => {
+        getCurrentLocation(); // ✅ auto pickup
+    }, []);
 
-            })
-            setPickupSuggestions(response.data)
-        } catch {
-            // handle error
+
+    // const handlePickupChange = async (e) => {
+    //     setPickup(e.target.value)
+    //     try {
+    //         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
+    //             params: { input: e.target.value },
+    //             headers: {
+    //                 Authorization: `Bearer ${localStorage.getItem('token')}`
+    //             }
+
+    //         })
+    //         setPickupSuggestions(response.data)
+    //     } catch {
+    //         // handle error
+    //     }
+    // }
+
+    const handlePickupChange = async (e) => {
+        const value = e.target.value;
+        setPickup(value);
+
+        if (!value.trim()) return; // ✅ FIX (stops 400 error)
+
+        try {
+            const response = await axios.get(
+                `${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`,
+                {
+                    params: { input: value },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                }
+            );
+
+            setPickupSuggestions(response.data);
+        } catch (err) {
+            console.log(err);
         }
-    }
+    };
 
 
     const handleDestinationChange = async (e) => {
@@ -202,8 +231,51 @@ const Home = () => {
         })
         console.log(response.data)
 
+
     }
 
+    // for current location ..
+
+
+    const getCurrentLocation = () => {
+        if (!navigator.geolocation) {
+            alert("Geolocation not supported");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+
+                console.log("Lat:", latitude, "Lng:", longitude); // ✅ debug
+
+                try {
+                    const res = await axios.get(
+                        `${import.meta.env.VITE_BASE_URL}/maps/reverse-geocode`,
+                        {
+                            params: {
+                                lat: latitude,
+                                lng: longitude
+                            }
+                        }
+                    );
+
+                    console.log("Address:", res.data); // ✅ debug
+
+                    setPickup(res.data.address); // ✅ set value
+                    setPanelOpen(false); // optional
+
+                } catch (err) {
+                    console.log("API ERROR:", err);
+                    alert("Failed to get address");
+                }
+            },
+            (error) => {
+                console.log("LOCATION ERROR:", error);
+                alert("Please allow location access");
+            }
+        );
+    };
     return (
         <div className='h-screen realtive overflow-hidden'>
             <img className='w-16 absolute left-5 top-5' src={autovelologo} alt="" />
@@ -247,13 +319,22 @@ const Home = () => {
                             type="text"
                             placeholder='Enter your Destination' />
                     </form>
+
+
+                </div>
+                <div ref={panelRef} className=' bg-white h-0'>
+                    {/* current location button code  */}
+                    <button
+                        onClick={getCurrentLocation}
+                        className='bg-blue-500 text-white px-3 py-2 rounded mt-2 w-full'
+                    >
+                        Use Current Location
+                    </button>
                     <button
                         onClick={findTrip}
                         className='bg-black text-white px-4 py-2 rounded-lg mt-3 w-full'>
                         Find Trip
                     </button>
-                </div>
-                <div ref={panelRef} className=' bg-white h-0'>
                     <LocationSearchPanel
                         suggestions={activeField === 'pickup' ? pickupSuggestions : destinationSuggestions}
                         setPanelOpen={setPanelOpen}
@@ -297,6 +378,7 @@ const Home = () => {
                     setWaitingForDriver={setWaitingForDriver}
                     waitingForDriver={waitingForDriver} />
             </div>
+            <ChatBot />
         </div>
     )
 }

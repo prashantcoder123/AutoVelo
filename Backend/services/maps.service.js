@@ -10,10 +10,15 @@ module.exports.getAddressCoordinate = async (address) => {
         console.log(response.data);
         if (response.data.status === 'OK') {
             const location = response.data.results[0].geometry.location;
+            // return {
+            //     ltd: location.lat,
+            //     lng: location.lng
+            // };
+
             return {
-                ltd: location.lat,
-                lng: location.lng
-            };
+                lat: response.data.results[0].geometry.location.lat,
+                lng: response.data.results[0].geometry.location.lng
+            }
         } else {
             throw new Error('Unable to fetch coordinates');
         }

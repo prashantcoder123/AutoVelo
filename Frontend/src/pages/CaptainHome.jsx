@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
 import autovelologo from "../assets/autovelologo.jpeg";
+import CaptainChatbot from "../components/CaptainChatbot";
 
 import { useEffect, useContext } from "react";
 import { SocketContext } from "../context/SocketContext";
@@ -153,6 +154,7 @@ const CaptainHome = () => {
           setRidePopupPanel={setRidePopupPanel}
         />
       </div>
+      <CaptainChatbot />
     </div>
   );
 };

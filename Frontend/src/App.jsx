@@ -14,6 +14,12 @@ import CaptainLogout from './pages/CaptainLogout'
 import Riding from './pages/Riding'
 import CaptainRiding from './pages/CaptainRiding'
 import Payment from './pages/Payment'
+import GroceryLogin from './pages/grocery/GroceryLogin'
+import GrocerySignup from './pages/grocery/GrocerySignup'
+import GroceryHome from './pages/grocery/GroceryHome'
+import GroceryShopLogin from './pages/grocery/GroceryShopLogin'
+import GroceryShopSignup from './pages/grocery/GroceryShopSignup'
+
 const App = () => {
 
   return (
@@ -47,7 +53,11 @@ const App = () => {
             <CaptainLogout />
           </CaptainProtectWrapper>
         } />
-
+        <Route path="/grocery/login" element={<GroceryLogin />} />
+        <Route path="/grocery/signup" element={<GrocerySignup />} />
+        <Route path="/grocery/home" element={<GroceryHome />} />
+        <Route path="/grocery/shop/login" element={<GroceryShopLogin />} />
+        <Route path="/grocery/shop/signup" element={<GroceryShopSignup />} />
 
       </Routes>
     </div>
