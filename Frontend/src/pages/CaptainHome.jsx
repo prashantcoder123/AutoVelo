@@ -12,7 +12,7 @@ import { useEffect, useContext } from "react";
 import { SocketContext } from "../context/SocketContext";
 import { CaptainDataContext } from "../context/CapatainContext";
 import axios from "axios";
-
+import ProfileMenu from "../components/ProfileMenu";
 const CaptainHome = () => {
   const [ridePopupPanel, setRidePopupPanel] = useState(false);
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
@@ -155,6 +155,7 @@ const CaptainHome = () => {
         />
       </div>
       <CaptainChatbot />
+      <ProfileMenu userType="captain" />
     </div>
   );
 };

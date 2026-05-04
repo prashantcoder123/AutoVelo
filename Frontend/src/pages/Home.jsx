@@ -16,6 +16,7 @@ import { UserDataContext } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import LiveTracking from '../components/LiveTracking';
 import ChatBot from '../components/Chatbot';
+import ProfileMenu from '../components/ProfileMenu';
 const Home = () => {
 
     const [pickup, setPickup] = useState('')
@@ -379,6 +380,7 @@ const Home = () => {
                     waitingForDriver={waitingForDriver} />
             </div>
             <ChatBot />
+            <ProfileMenu userType="user" />
         </div>
     )
 }
