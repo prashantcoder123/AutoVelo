@@ -18,7 +18,13 @@ const rideHistoryRoutes = require("./routes/rideHistory.routes");
 
 connectToDb();
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'https://auto-velo-db85.vercel.app'
+    ],
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
