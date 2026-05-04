@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useContext, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import FinishRide from '../components/FinishRide'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import autovelologo from '../assets/autovelologo.jpeg';
-
+import { SocketContext } from '../context/SocketContext'
 import LiveTracking from '../components/LiveTracking'
 
 const CaptainRiding = () => {
@@ -13,9 +13,19 @@ const CaptainRiding = () => {
     const finishRidePanelRef = useRef(null)
     const location = useLocation()
     const rideData = location.state?.ride
+    const { socket } = useContext(SocketContext)
 
+    useEffect(() => {
+        // Listen for payment received from user even if the panel is closed!
+        socket.on("payment-received", (data) => {
+            alert(`💰 Payment of ₹${data.fare} received!`)
+            setFinishRidePanel(true) // Open the panel automatically so captain can finish the ride
+        })
 
-
+        return () => {
+            socket.off("payment-received")
+        }
+    }, [socket])
 
     useGSAP(function () {
         if (finishRidePanel) {
@@ -49,11 +59,7 @@ const CaptainRiding = () => {
                     setFinishRidePanel(true)
                 }}
             >
-                <h5 className='p-1 text-center w-[90%] absolute top-0'
-                //  onClick={() => {
-
-                // }}
-                >
+                <h5 className='p-1 text-center w-[90%] absolute top-0'>
                     <i className="text-3xl text-gray-800 ri-arrow-up-wide-line"></i></h5>
                 <h4 className='text-xl font-semibold'>{'4 KM away'}</h4>
                 <button className=' bg-green-600 text-white font-semibold p-3 px-10 rounded-lg'>Complete Ride</button>

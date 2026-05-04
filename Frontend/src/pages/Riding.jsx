@@ -99,13 +99,28 @@ const Riding = () => {
                     <i className="text-lg font-medium ri-home-5-line"></i>
                 </Link>
 
-                {/* PAYMENT BUTTON */}
-                <button
-                    onClick={() => navigate('/payment', { state: { ride } })}
-                    className='w-full mt-5 bg-green-600 text-white font-semibold p-2 rounded-lg'
-                >
-                    Make a Payment
-                </button>
+                {/* PAYMENT OPTIONS */}
+                <div className='flex gap-3 mt-5'>
+                    <button
+                        onClick={() => navigate('/payment', { state: { ride } })}
+                        className='flex-1 bg-green-600 text-white font-semibold p-3 rounded-lg flex flex-col items-center gap-1'
+                        style={{ boxShadow: '0 4px 12px rgba(76,175,80,0.3)' }}
+                    >
+                        <span className='text-lg'>📱</span>
+                        <span>Pay via UPI</span>
+                        <span className='text-xs opacity-80'>GPay / PhonePe / Paytm</span>
+                    </button>
+
+                    <div
+                        onClick={() => alert(`Please hand ₹${ride?.fare} in cash to your driver.`)}
+                        className='flex-1 bg-amber-500 text-white font-semibold p-3 rounded-lg flex flex-col items-center gap-1 cursor-pointer'
+                        style={{ boxShadow: '0 4px 12px rgba(245,158,11,0.3)' }}
+                    >
+                        <span className='text-lg'>💵</span>
+                        <span>Pay Cash</span>
+                        <span className='text-xs opacity-80'>₹{ride?.fare} to driver</span>
+                    </div>
+                </div>
 
             </div>
         </div>
