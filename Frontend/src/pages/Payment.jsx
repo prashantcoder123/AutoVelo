@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { QRCodeCanvas } from 'qrcode.react'
 import axios from 'axios'
+import googlePayLogo from '../assets/google-pay.svg'
+import phonepeLogo from '../assets/phonepe.svg'
+import paytmLogo from '../assets/paytm.svg'
 
 const Payment = () => {
     const location = useLocation()
@@ -244,7 +247,9 @@ const Payment = () => {
                         onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
                     >
-                        <span style={{ fontSize: 24 }}>🟢</span>
+                        <div style={{ background: '#fff', width: '100%', borderRadius: 8, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px' }}>
+                            <img src={googlePayLogo} alt="Google Pay" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
+                        </div>
                         Google Pay
                     </button>
 
@@ -269,7 +274,9 @@ const Payment = () => {
                         onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
                     >
-                        <span style={{ fontSize: 24 }}>🟣</span>
+                        <div style={{ background: '#fff', width: '100%', borderRadius: 8, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px' }}>
+                            <img src={phonepeLogo} alt="PhonePe" style={{ height: '90%', width: 'auto', objectFit: 'contain' }} />
+                        </div>
                         PhonePe
                     </button>
 
@@ -294,7 +301,9 @@ const Payment = () => {
                         onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
                     >
-                        <span style={{ fontSize: 24 }}>🔵</span>
+                        <div style={{ background: '#fff', width: '100%', borderRadius: 8, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px' }}>
+                            <img src={paytmLogo} alt="Paytm" style={{ height: '65%', width: 'auto', objectFit: 'contain' }} />
+                        </div>
                         Paytm
                     </button>
                 </div>

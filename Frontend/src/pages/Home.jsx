@@ -68,6 +68,18 @@ const Home = () => {
         getCurrentLocation(); // ✅ auto pickup
     }, []);
 
+    useEffect(() => {
+        let timer;
+        if (vehicleFound) {
+            timer = setTimeout(() => {
+                alert("Rider not available");
+                setVehicleFound(false);
+                window.location.href = '/home';
+            }, 60000);
+        }
+        return () => clearTimeout(timer);
+    }, [vehicleFound]);
+
 
     // const handlePickupChange = async (e) => {
     //     setPickup(e.target.value)
