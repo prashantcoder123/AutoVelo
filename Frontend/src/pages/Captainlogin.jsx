@@ -9,6 +9,7 @@ import autovelologo from '../assets/autovelologo.jpeg';
 const Captainlogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     //const [captainData, setCaptainData] = useState('')
 
     const { captain, setCaptain } = React.useContext(CaptainDataContext)
@@ -17,21 +18,27 @@ const Captainlogin = () => {
 
     const SubmitHandler = async (e) => {
         e.preventDefault();
+        setError('');
         const captain = {
             email: email,
             password
         }
 
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captain)
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captain)
 
-        if (response.status === 200) {
-            const data = response.data
+            if (response.status === 200) {
+                const data = response.data
 
-            setCaptain(data.captain)
-            localStorage.setItem('token', data.token)
-            navigate('/captain-home')
+                setCaptain(data.captain)
+                localStorage.setItem('token', data.token)
+                navigate('/captain-home')
 
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || 'Invalid credentials')
         }
+        
         setEmail('');
         setPassword('');
     }
@@ -40,6 +47,7 @@ const Captainlogin = () => {
         <div className='p-7 h-screen flex flex-col justify-between'>
             <div>
                 <img className='w-16 mb-10' src={autovelologo} alt='' />
+                {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
                 <form onSubmit={(e) => { SubmitHandler(e) }}>
                     <h3 className='text-lg font-medium mb-2'>What's Your email</h3>
 

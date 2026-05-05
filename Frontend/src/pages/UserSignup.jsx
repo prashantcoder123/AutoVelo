@@ -11,6 +11,7 @@ const UserSignup = () => {
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [userData, setUserData] = useState({})
+    const [error, setError] = useState('')
 
     const navigate = useNavigate()
     const { user, setUser } = useContext(UserDataContext)
@@ -18,6 +19,7 @@ const UserSignup = () => {
 
     async function submitHandler(e) {
         e.preventDefault()
+        setError('')
         const newUser = {
             fullname: {
                 firstname: firstName,
@@ -26,12 +28,17 @@ const UserSignup = () => {
             email: email,
             password: password
         }
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser)
-        if (response.status === 201) {
-            const data = response.data
-            setUser(data.user)
-            localStorage.setItem('token', data.token)
-            navigate('/home')
+        
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser)
+            if (response.status === 201) {
+                const data = response.data
+                setUser(data.user)
+                localStorage.setItem('token', data.token)
+                navigate('/home')
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || 'Invalid credentials')
         }
 
         setEmail('')
@@ -44,6 +51,7 @@ const UserSignup = () => {
             <div className='p-7 h-screen flex flex-col justify-between'>
                 <div>
                     <img className='w-16 mb-10' src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYQy-OIkA6In0fTvVwZADPmFFibjmszu2A0g&s" alt="" />
+                    {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
 
                     <form onSubmit={(e) => {
                         submitHandler(e)

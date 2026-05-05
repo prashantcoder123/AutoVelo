@@ -20,11 +20,13 @@ const CaptainSignup = () => {
     const [vehiclePlate, setVehiclePlate] = useState('')
     const [vehicleCapacity, setVehicleCapacity] = useState('')
     const [vehicleType, setVehicleType] = useState('')
+    const [error, setError] = useState('')
 
     const { captain, setCaptain } = React.useContext(CaptainDataContext)
 
     const submitHandler = async (e) => {
         e.preventDefault()
+        setError('')
         const captainData = {
             fullname: {
                 firstname: firstName,
@@ -40,13 +42,17 @@ const CaptainSignup = () => {
             }
         }
 
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, captainData)
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, captainData)
 
-        if (response.status === 201) {
-            const data = response.data
-            setCaptain(data.captain)
-            localStorage.setItem('token', data.token)
-            navigate('/captain-home')
+            if (response.status === 201) {
+                const data = response.data
+                setCaptain(data.captain)
+                localStorage.setItem('token', data.token)
+                navigate('/captain-home')
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || 'Invalid credentials')
         }
 
         setEmail('')
@@ -64,6 +70,7 @@ const CaptainSignup = () => {
         <div className='py-5 px-5 h-screen flex flex-col justify-between'>
             <div>
                 <img className='w-22 h-18 mb-3' src={autovelologo} alt="" />
+                {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
 
                 <form onSubmit={(e) => {
                     submitHandler(e)

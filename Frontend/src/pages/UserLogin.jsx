@@ -9,6 +9,7 @@ const UserLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [userData, setUserData] = useState({})
+    const [error, setError] = useState('')
 
     const { user, setUser } = useContext(UserDataContext)
     const navigate = useNavigate()
@@ -16,19 +17,25 @@ const UserLogin = () => {
 
     const SubmitHandler = async (e) => {
         e.preventDefault();
+        setError('');
         const userData = {
             email: email,
             password: password
         }
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData)
+        
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData)
 
-
-        if (response.status === 200) {
-            const data = response.data
-            setUser(data.user)
-            localStorage.setItem('token', data.token)
-            navigate('/home')
+            if (response.status === 200) {
+                const data = response.data
+                setUser(data.user)
+                localStorage.setItem('token', data.token)
+                navigate('/home')
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || 'Invalid credentials')
         }
+        
         setEmail('');
         setPassword('');
     }
@@ -37,6 +44,7 @@ const UserLogin = () => {
         <div className='p-7 h-screen flex flex-col justify-between'>
             <div>
                 <img className='w-25 h-20 mb-10' src={autovelologo} alt='' />
+                {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
                 <form onSubmit={(e) => { SubmitHandler(e) }}>
                     <h3 className='text-lg font-medium mb-2'>What's Your email</h3>
 
